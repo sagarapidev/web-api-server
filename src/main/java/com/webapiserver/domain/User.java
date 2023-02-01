@@ -19,7 +19,7 @@ public class User {
     private long id;
 
     @Column(name = "name")
-    private String title;
+    private String name;
 
     @Column(name = "email")
     private String email;
