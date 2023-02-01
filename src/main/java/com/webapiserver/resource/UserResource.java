@@ -11,12 +11,18 @@ import com.webapiserver.domain.User;
 import com.webapiserver.repository.UserRepository;
 import com.webapiserver.service.CsvService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -31,7 +37,8 @@ public class UserResource {
 
     @Autowired
     CsvService csvService;
-
+    @Value("classpath:data\"")
+    Resource resourcePath;
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
         Optional<User> user =userRepository.findById(id);
@@ -99,10 +106,9 @@ public class UserResource {
 
         // set file name and content type
         String filename = "Employee-List.csv";
-
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + filename + "\"");
+                "attachment; filename=\"" + filename+"test" + "\"");
 
         // create a csv writer
         StatefulBeanToCsv<User> writer =
