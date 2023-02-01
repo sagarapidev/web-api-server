@@ -31,6 +31,7 @@ public class FileResource {
         FWRITE.write(FILE.toString());
         FWRITE.close();
 
+
         List<String> FILES_IN_DIR = FileHandlerUtils.listFilesForDirectory(DIR);
         response.put("DUMP", FILES_IN_DIR);
         return new ResponseEntity<>(response, HttpStatus.OK);

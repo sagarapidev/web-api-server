@@ -1,13 +1,24 @@
 package com.webapiserver.resource;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
+import com.github.javafaker.service.FakeValuesService;
+import com.github.javafaker.service.RandomService;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.webapiserver.domain.User;
 import com.webapiserver.repository.UserRepository;
+import com.webapiserver.service.CsvService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
@@ -17,6 +28,9 @@ public class UserResource {
 
     @Autowired
     UserRepository  userRepository;
+
+    @Autowired
+    CsvService csvService;
 
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
@@ -32,6 +46,10 @@ public class UserResource {
     @PostMapping("/user/create")
     public ResponseEntity<User> createUser(@RequestBody User usr) {
         try {
+            Faker usFaker = new Faker(new Locale("en-US"));
+            FakeValuesService fakeValuesService = new FakeValuesService(new Locale("en-US"), new RandomService());
+              usr.setName(usFaker.name().firstName());
+              usr.setEmail(usFaker.name().firstName().concat("@gmail.com"));
             User user = userRepository.save(usr);
             return new ResponseEntity<>(user, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -75,5 +93,28 @@ public class UserResource {
         return new ResponseEntity<>(users,HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/user/csv/export")
+    public void exportCSV(HttpServletResponse response)
+            throws Exception {
+
+        // set file name and content type
+        String filename = "Employee-List.csv";
+
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + filename + "\"");
+
+        // create a csv writer
+        StatefulBeanToCsv<User> writer =
+                new StatefulBeanToCsvBuilder<User>
+                        (response.getWriter())
+                        .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                        .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                        .withOrderedResults(false).build();
+
+        // write all employees to csv file
+        writer.write(csvService.fetchAllUser());
+
+    }
 
 }
