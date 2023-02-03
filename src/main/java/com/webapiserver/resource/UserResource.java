@@ -51,7 +51,7 @@ public class UserResource {
     @Value("classpath:data\"")
     Resource resourcePath;
     @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
         Optional<User> user =userRepository.findById(id);
 
         if (user.isPresent()) {
@@ -76,7 +76,7 @@ public class UserResource {
     }
 
     @PutMapping("/user/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User usr) {
+    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User usr) {
         Optional<User> user = userRepository.findById(id);
 
         if (user.isPresent()) {
@@ -87,7 +87,7 @@ public class UserResource {
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") long id) {
+    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") String id) {
         try {
             userRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -143,7 +143,8 @@ Download file in external user defined file location
     public ResponseEntity<String> downloadCSV(@RequestParam(required = true) String tableName)
             throws Exception {
         String FILE_LOCATION=configProperty.getDownloadLocation()
-                +tableName+SpecialCharConstant.UNDERSCORE+ Instant.now().getEpochSecond()
+                //+tableName+SpecialCharConstant.UNDERSCORE+ Instant.now().getEpochSecond()
+                +tableName
                 + Constant.CSV_EXTENSION;
         log.info("file-location:{}",FILE_LOCATION);
         Writer writer = new FileWriter(FILE_LOCATION);
@@ -154,8 +155,9 @@ Download file in external user defined file location
         try {
             beanToCsv = new StatefulBeanToCsvBuilder<User>(writer)
                     .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                    .withLineEnd(CSVWriter.DEFAULT_LINE_END)
                     .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                    .withOrderedResults(false).build();
+                    .withOrderedResults(true).build();
         }catch (Exception e){
             log.info("Exception Occurred beanToCsv object ref:{}",e.getMessage());
         }
@@ -166,5 +168,16 @@ Download file in external user defined file location
         writer.close();
         return new ResponseEntity<>("Successfully csv file download !",HttpStatus.OK);
     }
+    /*
+    @Param tableName
+    Download file in external user defined file location
+     */
+    @GetMapping("/bulk/csv/loaddata")
+    public ResponseEntity<String> bulkCSVLoad()
+            throws Exception {
+        csvService.loadCsvData("C:/Users/bsagar8/sagarapidev/my/csv/user_data.csv");
 
+       // userRepository.bulkLoadData();
+        return new ResponseEntity<>("Successfully csv file download !",HttpStatus.OK);
+    }
 }

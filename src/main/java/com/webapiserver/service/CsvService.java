@@ -8,4 +8,5 @@ import java.util.Map;
 public interface CsvService {
     List<User> fetchAllUser();
     List<Map<String, Object>> getResultSet(String query);
+    public void loadCsvData(String csvFile);
 }

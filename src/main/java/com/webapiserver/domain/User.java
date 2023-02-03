@@ -18,13 +18,12 @@ import javax.persistence.*;
 
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    long id;
+    String id;
     @Column(name = "name")
     String name;
     @Column(name = "email")
     String email;
     @Column(name = "status")
-    boolean status;
+    String status;
 
 }
