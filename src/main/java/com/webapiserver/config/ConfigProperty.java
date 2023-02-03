@@ -23,6 +23,12 @@ public class ConfigProperty {
     @Value("${LOG_FILENAME}")
     String logfile;
 
+    @Value("${DOWNLOAD_FILE_LOCATION}")
+    String downloadLocation;
+
+    @Value("${DOWNLOAD_FILE_EXTENTION}")
+    String extention;
+
     @Value("${GLOBAL_CONFIG_MESSAGE}")
     String globalConfigMessage;
 }
