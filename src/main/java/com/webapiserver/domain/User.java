@@ -2,6 +2,7 @@ package com.webapiserver.domain;
 
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 
@@ -10,21 +11,19 @@ import javax.persistence.*;
 @Accessors(chain=true)
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "user_data")
+
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
+    String id;
     @Column(name = "name")
-    private String name;
-
+    String name;
     @Column(name = "email")
-    private String email;
-
+    String email;
     @Column(name = "status")
-    private boolean status;
+    String status;
 
 }

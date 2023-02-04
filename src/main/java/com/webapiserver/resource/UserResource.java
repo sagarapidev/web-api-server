@@ -7,9 +7,13 @@ import com.github.javafaker.service.RandomService;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.webapiserver.common.SpecialCharConstant;
+import com.webapiserver.config.ConfigProperty;
+import com.webapiserver.config.Constant;
 import com.webapiserver.domain.User;
 import com.webapiserver.repository.UserRepository;
 import com.webapiserver.service.CsvService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -21,12 +25,16 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
+@Slf4j
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
@@ -36,11 +44,14 @@ public class UserResource {
     UserRepository  userRepository;
 
     @Autowired
+    ConfigProperty configProperty;
+
+    @Autowired
     CsvService csvService;
     @Value("classpath:data\"")
     Resource resourcePath;
     @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
         Optional<User> user =userRepository.findById(id);
 
         if (user.isPresent()) {
@@ -65,7 +76,7 @@ public class UserResource {
     }
 
     @PutMapping("/user/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User usr) {
+    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User usr) {
         Optional<User> user = userRepository.findById(id);
 
         if (user.isPresent()) {
@@ -76,7 +87,7 @@ public class UserResource {
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") long id) {
+    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") String id) {
         try {
             userRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -99,16 +110,18 @@ public class UserResource {
         }
         return new ResponseEntity<>(users,HttpStatus.NO_CONTENT);
     }
-
-    @GetMapping("/user/csv/export")
-    public void exportCSV(HttpServletResponse response)
+    /*
+    Download data current system download folder
+     */
+    @GetMapping("/user/csv/download")
+    public void exportCSV(HttpServletResponse response,@RequestParam(required = true) String tableName)
             throws Exception {
 
         // set file name and content type
-        String filename = "Employee-List.csv";
+        String filename = tableName+configProperty.getExtention();
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + filename+"test" + "\"");
+                "attachment; filename=\"" + filename+ "\"");
 
         // create a csv writer
         StatefulBeanToCsv<User> writer =
@@ -122,5 +135,49 @@ public class UserResource {
         writer.write(csvService.fetchAllUser());
 
     }
+/*
+@Param tableName
+Download file in external user defined file location
+ */
+    @GetMapping("/external/backup/file/csv")
+    public ResponseEntity<String> downloadCSV(@RequestParam(required = true) String tableName)
+            throws Exception {
+        String FILE_LOCATION=configProperty.getDownloadLocation()
+                //+tableName+SpecialCharConstant.UNDERSCORE+ Instant.now().getEpochSecond()
+                +tableName
+                + Constant.CSV_EXTENSION;
+        log.info("file-location:{}",FILE_LOCATION);
+        Writer writer = new FileWriter(FILE_LOCATION);
 
+
+
+        StatefulBeanToCsv<User> beanToCsv = null;
+        try {
+            beanToCsv = new StatefulBeanToCsvBuilder<User>(writer)
+                    .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                    .withLineEnd(CSVWriter.DEFAULT_LINE_END)
+                    .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                    .withOrderedResults(true).build();
+        }catch (Exception e){
+            log.info("Exception Occurred beanToCsv object ref:{}",e.getMessage());
+        }
+
+
+        beanToCsv.write(csvService.fetchAllUser());
+        writer.flush();
+        writer.close();
+        return new ResponseEntity<>("Successfully csv file download !",HttpStatus.OK);
+    }
+    /*
+    @Param tableName
+    Download file in external user defined file location
+     */
+    @GetMapping("/bulk/csv/loaddata")
+    public ResponseEntity<String> bulkCSVLoad()
+            throws Exception {
+        csvService.loadCsvData("C:/Users/bsagar8/sagarapidev/my/csv/user_data.csv");
+
+       // userRepository.bulkLoadData();
+        return new ResponseEntity<>("Successfully csv file download !",HttpStatus.OK);
+    }
 }
