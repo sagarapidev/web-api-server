@@ -26,8 +26,8 @@ public class ConfigProperty {
     @Value("${DOWNLOAD_FILE_LOCATION}")
     String downloadLocation;
 
-    @Value("${DOWNLOAD_FILE_EXTENTION}")
-    String extention;
+    @Value("${DOWNLOAD_FILE_EXTENSION}")
+    String extension;
 
     @Value("${GLOBAL_CONFIG_MESSAGE}")
     String globalConfigMessage;

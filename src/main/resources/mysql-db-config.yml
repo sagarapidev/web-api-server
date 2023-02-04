@@ -1,0 +1,8 @@
+prod:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/sagarapidev
+    username: sagarapidev
+    password: sagarapidev
+    hikari:
+      idle-timeout: 10000

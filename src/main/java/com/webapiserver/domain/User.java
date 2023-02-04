@@ -3,8 +3,10 @@ package com.webapiserver.domain;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -16,8 +18,11 @@ import javax.persistence.*;
 @Entity
 @Table(name = "user_data")
 
-public class User {
-    @Id
+public class User implements Serializable {
+   @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id",columnDefinition = "VARCHAR(255)")
     String id;
     @Column(name = "name")
     String name;
