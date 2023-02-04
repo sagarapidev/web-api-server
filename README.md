@@ -18,4 +18,5 @@
 "Step-11":"FLUSH PRIVILEGES;"
 }
 
-}
+## Solved some spring-boot question
++ HOW TO LOAD CSV INTO MYSQL FROM SPRINGBOOT NATIVE QUERY ?
