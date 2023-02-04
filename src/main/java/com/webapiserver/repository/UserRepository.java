@@ -11,7 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserRepository extends JpaRepository<User, String> {
     @Modifying
     @Transactional
-    @Query(value="LOAD DATA INFILE 'C:/Users/bsagar8/sagarapidev/my/csv/TTuser_data.csv' INTO TABLE USER_DATA FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES",nativeQuery = true)
+    @Query(value="LOAD DATA INFILE 'C:/Users/bsagar8/sagarapidev/my/csv/user_data.csv' INTO TABLE USER_DATA FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES",nativeQuery = true)
     public void bulkLoadData();
 
+    @Modifying
+    @Transactional
+    @Query(value="LOAD DATA INFILE 'E:/sagarapidev/web-api-server/csv/user_data.csv' INTO TABLE user_data FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES",nativeQuery = true)
+    public void myLaptopBulkCsvDataLoad();
 }

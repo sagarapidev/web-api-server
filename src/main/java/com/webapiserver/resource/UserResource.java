@@ -1,13 +1,11 @@
 package com.webapiserver.resource;
 
 import com.github.javafaker.Faker;
-import com.github.javafaker.Name;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.webapiserver.common.SpecialCharConstant;
 import com.webapiserver.config.ConfigProperty;
 import com.webapiserver.config.Constant;
 import com.webapiserver.domain.User;
@@ -20,17 +18,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -54,11 +46,7 @@ public class UserResource {
     public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
         Optional<User> user =userRepository.findById(id);
 
-        if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping("/user/create")
@@ -118,7 +106,7 @@ public class UserResource {
             throws Exception {
 
         // set file name and content type
-        String filename = tableName+configProperty.getExtention();
+        String filename = tableName+configProperty.getExtension();
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + filename+ "\"");
@@ -163,6 +151,7 @@ Download file in external user defined file location
         }
 
 
+        assert beanToCsv != null;
         beanToCsv.write(csvService.fetchAllUser());
         writer.flush();
         writer.close();
@@ -172,12 +161,13 @@ Download file in external user defined file location
     @Param tableName
     Download file in external user defined file location
      */
-    @GetMapping("/bulk/csv/loaddata")
+    @GetMapping("/bulk/csv/load")
     public ResponseEntity<String> bulkCSVLoad()
             throws Exception {
-        csvService.loadCsvData("C:/Users/bsagar8/sagarapidev/my/csv/user_data.csv");
-
+       // csvService.loadCsvData("C:/Users/bsagar8/sagarapidev/my/csv/user_data.csv");
+       // csvService.loadCsvData("E:/sagarapidev/web-api-server/csv/user_data.csv");
        // userRepository.bulkLoadData();
+        userRepository.myLaptopBulkCsvDataLoad();
         return new ResponseEntity<>("Successfully csv file download !",HttpStatus.OK);
     }
 }

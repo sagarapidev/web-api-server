@@ -1,0 +1,9 @@
+dev:
+  datasource:
+    driver-class-name: org.h2.Driver
+    jdbcUrl: jdbc:h2:file:${user.dir}/data/h2db
+    username: sa
+    password:
+    hikari:
+      idle-timeout: 10000
+      maximum-pool-size=20:
