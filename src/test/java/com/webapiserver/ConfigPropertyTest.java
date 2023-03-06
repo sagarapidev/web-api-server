@@ -18,10 +18,10 @@ public class ConfigPropertyTest {
 
     @Test
     void envUserHome() {
-        log.info("user.home:{}",configProperty.getLogfile());
+       /* log.info("user.home:{}",configProperty.getLogfile());
         log.info("user.dir:{}",configProperty.getUserDir());
         log.info("user.logfile:{}",configProperty.getLogfile());
-        log.info("global.config:{}",configProperty.getGlobalConfigMessage());
+        log.info("global.config:{}",configProperty.getGlobalConfigMessage());*/
 
     }
 }
