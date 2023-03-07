@@ -1,7 +1,8 @@
 spring:
-  -profiles:
-    active: "prod"
-    default: "dev"
+  profiles:
+    active: prod
+
+
   jpa:
     open-in-view: false
     hibernate:
